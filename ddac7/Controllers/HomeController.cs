@@ -12,6 +12,7 @@ namespace ddac7.Controllers
     {
         public IActionResult Index()
         {
+            var tt = "abc";
             return View();
         }
 
