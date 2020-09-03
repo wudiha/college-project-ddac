@@ -30,8 +30,7 @@ namespace ddac7
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -51,7 +50,7 @@ namespace ddac7
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            //app.UseAuthentication();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
