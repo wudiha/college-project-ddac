@@ -20,7 +20,9 @@ namespace ddac7.Areas.Identity
                     options.UseSqlServer(
                         context.Configuration.GetConnectionString("AuthDbContextConnection")));
 
-                services.AddIdentity<ClinicAppUser,IdentityRole>()
+                services.AddDefaultIdentity<ClinicAppUser>()
+                .AddRoles<IdentityRole>()
+           
                     .AddEntityFrameworkStores<AuthDbContext>();
             });
         }
