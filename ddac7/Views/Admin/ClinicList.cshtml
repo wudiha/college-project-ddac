@@ -1,0 +1,50 @@
+﻿@model IEnumerable<ddac7.Models.User>
+@{
+    ViewData["Title"] = "Clinic";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+<div class="form-group">
+    <a class="btn btn-default" href="/Identity/Account/Register" style="color:blue">Add Clinic Account</a>
+</div>
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}
+
+<table class="table" border="1">
+    <thead>
+        <tr bgcolor="lightblue">
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th bgcolor="pink"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td>
+                    <a asp-action="EditClinic" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="DeleteClinic" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

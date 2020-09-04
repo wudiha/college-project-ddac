@@ -67,29 +67,64 @@ namespace ddac7.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new ClinicAppUser { UserName = Input.Email, Email = Input.Email };
-                var result = await _userManager.CreateAsync(user, Input.Password);
-                if (result.Succeeded)
+                var userCheck = await _userManager.GetUserAsync(User);
+                //for admin create clinic acc
+                if (userCheck != null)
                 {
-                    _logger.LogInformation("User created a new account with password.");
-                    _userManager.AddToRoleAsync(user, "Patient").Wait(); // 暂时
-                   
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { userId = user.Id, code = code },
-                        protocol: Request.Scheme);
+                    var user = new ClinicAppUser { UserName = Input.Email, Email = Input.Email };
+                    var result = await _userManager.CreateAsync(user, Input.Password);
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("User created a new account with password.");
+                        _userManager.AddToRoleAsync(user, "Clinic").Wait(); // 暂时
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { userId = user.Id, code = code },
+                            protocol: Request.Scheme);
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        TempData["message"] = "Clinic " + user.Email + " account has been created."; //暂时
+                        return RedirectToAction("ClinicList", "Admin");
+                        //return LocalRedirect(returnUrl);
+                    }
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
-                foreach (var error in result.Errors)
+                //for normal patient register acc
+                else
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    var user = new ClinicAppUser { UserName = Input.Email, Email = Input.Email };
+                    var result = await _userManager.CreateAsync(user, Input.Password);
+                    if (result.Succeeded)
+                    {
+                        _logger.LogInformation("User created a new account with password.");
+                        _userManager.AddToRoleAsync(user, "Patient").Wait(); // 暂时
+
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { userId = user.Id, code = code },
+                            protocol: Request.Scheme);
+
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        return LocalRedirect(returnUrl);
+                    }
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
             }
 
