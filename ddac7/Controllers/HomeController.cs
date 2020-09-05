@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ddac7.Controllers
 {
-    [Authorize(Roles = "Patient")]
+    
     public class HomeController : Controller
     {
         private readonly UserManager<ClinicAppUser> _userManager;
@@ -26,8 +26,11 @@ namespace ddac7.Controllers
 
         public IActionResult Index()
         {
-            var tt = "abc";
-            var hehe = "cdf";
+            if (User.IsInRole("Clinic")) 
+            {
+                return LocalRedirect("~/Clinic/Index");
+            }
+
             return View();
         }
 
