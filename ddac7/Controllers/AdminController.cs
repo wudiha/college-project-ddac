@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ddac7.Controllers
 {
     //[Authorize(Roles ="SuperAdmin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;

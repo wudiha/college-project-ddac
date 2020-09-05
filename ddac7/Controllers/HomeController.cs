@@ -8,9 +8,11 @@ using ddac7.Models;
 using ddac7.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ddac7.Controllers
 {
+    [Authorize(Roles = "Patient")]
     public class HomeController : Controller
     {
         private readonly UserManager<ClinicAppUser> _userManager;

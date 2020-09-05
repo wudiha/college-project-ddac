@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using ddac7.Areas.Identity.Data;
 using ddac7.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ddac7.Controllers
 {
+    [Authorize(Roles = "Clinic")]
     public class ClinicController : Controller
     {
         private readonly UserManager<ClinicAppUser> _userManager;
