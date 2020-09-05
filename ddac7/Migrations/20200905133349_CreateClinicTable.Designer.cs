@@ -92,7 +92,7 @@ namespace ddac7.Migrations
 
                     b.Property<string>("Status");
 
-                    b.Property<int>("UserID");
+                    b.Property<string>("UserID");
 
                     b.HasKey("Id");
 
