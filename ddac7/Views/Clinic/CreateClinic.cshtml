@@ -1,0 +1,54 @@
+﻿@model ddac7.Models.Clinic
+
+@{
+    ViewData["Title"] = "ClinicIndex";
+    Layout = "~/Views/Shared/_LayoutClinic.cshtml";
+}
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}
+
+<h2>Upload your clinic to list</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ClinicName" class="control-label"></label>
+                <input asp-for="ClinicName" class="form-control" />
+                <span asp-validation-for="ClinicName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClinicDesc" class="control-label"></label>
+                <input asp-for="ClinicDesc" class="form-control" />
+                <span asp-validation-for="ClinicDesc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactNum" class="control-label"></label>
+                <input asp-for="ContactNum" class="form-control" />
+                <span asp-validation-for="ContactNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactEmail" class="control-label"></label>
+                <input asp-for="ContactEmail" class="form-control" />
+                <span asp-validation-for="ContactEmail" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="Status" value="Open" />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

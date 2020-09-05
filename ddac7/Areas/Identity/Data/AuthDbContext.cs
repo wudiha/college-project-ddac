@@ -16,6 +16,8 @@ namespace ddac7.Models
         {
         }
 
+        public DbSet<Clinic> Clinic { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

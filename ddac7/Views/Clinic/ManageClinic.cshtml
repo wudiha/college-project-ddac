@@ -1,0 +1,104 @@
+﻿@model ddac7.Models.Clinic
+@{
+    ViewData["Title"] = "ClinicIndex";
+    Layout = "~/Views/Shared/_LayoutClinic.cshtml";
+}
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}
+
+<h2>Update Clinic Details</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ClinicName" class="control-label"></label>
+                <input asp-for="ClinicName" class="form-control" />
+                <span asp-validation-for="ClinicName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClinicDesc" class="control-label"></label>
+                <input asp-for="ClinicDesc" class="form-control" />
+                <span asp-validation-for="ClinicDesc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactNum" class="control-label"></label>
+                <input asp-for="ContactNum" class="form-control" />
+                <span asp-validation-for="ContactNum" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactEmail" class="control-label"></label>
+                <input asp-for="ContactEmail" class="form-control" />
+                <span asp-validation-for="ContactEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" readonly />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="UserID" />
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+        @if (Model.Status == "Open")
+        {
+            <p>
+                Click on "Close" button to change your clinic status:<br />
+                **If you change your unit status to close, <br />
+                your clinic will not be able to view by the patients, <br />
+                Therefore, patients will unable to make appointment.
+            </p>
+            <form asp-action="ChangeStatus">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ClinicName" />
+                <input type="hidden" asp-for="ClinicDesc" />
+                <input type="hidden" asp-for="ContactNum" />
+                <input type="hidden" asp-for="ContactEmail" />
+                <input type="hidden" asp-for="Status" value="Close" />
+                <input type="hidden" asp-for="UserID" />
+                <div class="form-group">
+                    <input type="submit" value="Close" class="btn btn-default" style="background-color:yellow" />
+                </div>
+            </form>
+
+        }
+        else
+        {
+            <p>
+                Click on "Open" button to change your clinic status:<br />
+                **If you change your unit status to open, <br />
+                your clinic will able to view by the patients, <br />
+                Therefore, patients will be able to make appointment.
+            </p>
+            <form asp-action="ChangeStatus">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ClinicName" />
+                <input type="hidden" asp-for="ClinicDesc" />
+                <input type="hidden" asp-for="ContactNum" />
+                <input type="hidden" asp-for="ContactEmail" />
+                <input type="hidden" asp-for="Status" value="Open" />
+                <input type="hidden" asp-for="UserID" />
+                <div class="form-group">
+                    <input type="submit" value="Open" class="btn btn-default" style="background-color:lightgreen" />
+                </div>
+            </form>
+        }
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

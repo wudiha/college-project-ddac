@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ddac7.Models;
 
 namespace ddac7.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    partial class AuthDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200905133349_CreateClinicTable")]
+    partial class CreateClinicTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,15 +75,14 @@ namespace ddac7.Migrations
             modelBuilder.Entity("ddac7.Models.Clinic", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClinicDesc")
                         .IsRequired();
 
                     b.Property<string>("ClinicName")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasMaxLength(20);
 
                     b.Property<string>("ContactEmail")
                         .IsRequired();
@@ -91,7 +92,7 @@ namespace ddac7.Migrations
 
                     b.Property<string>("Status");
 
-                    b.Property<string>("UserID");
+                    b.Property<int>("UserID");
 
                     b.HasKey("Id");
 
