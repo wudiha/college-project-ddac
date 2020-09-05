@@ -88,6 +88,11 @@ namespace ddac7.Areas.Identity.Pages.Account
                             return LocalRedirect("~/Admin/Index");  // admin layout
                         }
 
+                        if (roles.First().Equals("Clinic"))
+                        {
+                            return LocalRedirect("~/Clinic/Index");  // clinic layout
+                        }
+
                         if (roles.First().Equals("Patient"))
                         {
                             return LocalRedirect("~/Home/About");  // patient layout
