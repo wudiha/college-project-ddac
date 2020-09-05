@@ -1,0 +1,37 @@
+﻿@model IEnumerable<ddac7.Models.Clinic>
+@{
+    ViewData["Title"] = "ViewClinicList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Clinic List</h2>
+
+<table class="table" border="1">
+    <thead>
+        <tr bgcolor="lightblue">
+            <th>@Html.DisplayNameFor(model => model.ClinicName)</th>
+            <th>@Html.DisplayNameFor(model => model.ContactNum)</th>
+            <th>@Html.DisplayNameFor(model => model.ContactEmail)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClinicName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactNum)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactEmail)
+                </td>
+                <td>
+                    <a asp-action="ClinicDetails" asp-route-id="@item.Id">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

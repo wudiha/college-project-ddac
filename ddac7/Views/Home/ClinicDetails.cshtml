@@ -1,0 +1,48 @@
+﻿@model ddac7.Models.Clinic
+@{
+    ViewData["Title"] = "ClinicDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Clinic: @Html.DisplayFor(model => model.ClinicName) Info</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ClinicName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClinicName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ClinicDesc)
+        </dt>
+        <dd>
+            <span>@Html.DisplayFor(model => model.ClinicDesc)</span>
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ContactNum)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ContactNum)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ContactEmail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ContactEmail)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="ViewClinicList">Back to List</a>
+</div>
+
+<style>
+    span {
+        display: block;
+        width: 600px;
+        word-wrap: break-word;
+    }
+</style>
