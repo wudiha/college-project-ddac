@@ -6,7 +6,13 @@
 
 <h2>Clinic List</h2>
 
-<table class="table" border="1">
+<form  style="margin-top: 10px;">
+    <input type="text" name="SearchString" placeholder="Enter Clinic Name here to search..">
+    <input type="submit" value="Search Clinic" />
+
+</form>
+
+<table class="table" border="1" style="margin-top: 80px;">
     <thead>
         <tr bgcolor="lightblue">
             <th>@Html.DisplayNameFor(model => model.ClinicName)</th>
@@ -35,3 +41,28 @@
         }
     </tbody>
 </table>
+
+<style>
+
+    input[type=text] {
+        padding: 10px;
+        font-size: 17px;
+        border: 1px solid grey;
+        float: left;
+        width: 300px;
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+
+    input[type=submit] {
+        float: left;
+        width: 150px;
+        padding: 10px;
+        background: #2196F3;
+        color: white;
+        font-size: 17px;
+        border: 1px solid grey;
+        border-radius: 2px;
+    }
+
+</style>

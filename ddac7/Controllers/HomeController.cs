@@ -9,6 +9,7 @@ using ddac7.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Globalization;
 
 namespace ddac7.Controllers
 {
@@ -53,7 +54,7 @@ namespace ddac7.Controllers
             return View();
         }
 
-        public IActionResult ViewClinicList()
+        public IActionResult ViewClinicList(string SearchString)
         {
             var result = (from a in _context.Clinic
                           where a.Status.Equals("Open")
@@ -67,6 +68,13 @@ namespace ddac7.Controllers
                               Status = a.Status,
                               UserID = a.UserID
                           }).ToList();
+
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                result = result.Where(s => 
+                    CultureInfo.CurrentCulture.CompareInfo.IndexOf
+                    (s.ClinicName, SearchString, CompareOptions.IgnoreCase)>=0).ToList();
+            }
 
             return View(result);
         }

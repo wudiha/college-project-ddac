@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using ddac7.Areas.Identity.Data
+@inject SignInManager<ClinicAppUser> SignInManager
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -30,20 +33,33 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="ViewClinicList">Clinic</a></li>
+                    @if (User.IsInRole("Patient"))
+                    {
+                        <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="ViewClinicList">Clinic</a></li>
+                    }
+                    @if (User.IsInRole("Clinic"))
+                    {
+                        <li><a asp-area="" asp-controller="Clinic" asp-action="Index">Home</a></li>
+                        <li><a asp-area="" asp-controller="Clinic" asp-action="CreateClinic">Manage Clinic</a></li>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li><a asp-area="" asp-controller="Admin" asp-action="Index">Home</a></li>
+                        <li><a asp-area="" asp-controller="Admin" asp-action="ClinicList">Manage Clinic</a></li>
+                    }
                 </ul>
-                <ul class="nav navbar-right">
-                    <partial name="_LoginPartial" />
-                </ul>
+                    <ul class="nav navbar-right">
+                        <partial name="_LoginPartial" />
+                    </ul>
             </div>
         </div>
     </nav>
 
     <partial name="_CookieConsentPartial" />
-   
+
     <div class="container body-content">
         @RenderBody()
         <hr />
