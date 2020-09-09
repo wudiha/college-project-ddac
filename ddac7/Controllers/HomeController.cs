@@ -150,9 +150,9 @@ namespace ddac7.Controllers
             int c = appointments.Count();
             string rowkey = "";
 
-            if(c<10)
+            if(c+1<10)
             rowkey = "C00" + (appointments.Count()+1).ToString(); 
-            else if(c>10&&c<100)
+            else if(c+1>10&&c+1<100)
             rowkey = "C0" + (appointments.Count() + 1).ToString();
             else 
             rowkey = "C" + (appointments.Count() + 1).ToString();
