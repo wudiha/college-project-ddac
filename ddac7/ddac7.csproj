@@ -30,6 +30,9 @@
     <Content Update="Views\Clinic\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Clinic\PendingAppointment.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Shared\_LayoutClinic.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

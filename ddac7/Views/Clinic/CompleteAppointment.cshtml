@@ -1,0 +1,45 @@
+﻿@model IEnumerable<ddac7.Models.Appointment>
+@{
+    ViewData["Title"] = "CompleteAppointment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>ViewAppointmentRecord</h2>
+
+<table class="table" border="1">
+    <thead>
+        <tr bgcolor="lightblue">
+            <th>Clinic</th>
+            <th>Appointment ID</th>
+            <th>Patient Name</th>
+            <th>Age</th>
+            <th>Appointment DateTime</th>
+            <th>Status</th>
+        <tr>
+    </thead>
+    <tbody>
+        @foreach (var appointment in Model)
+        {
+            <tr>
+                <td>
+                    @appointment.PartitionKey
+                </td>
+                <td>
+                    @appointment.RowKey
+                </td>
+                <td>
+                    @appointment.Name
+                </td>
+                <td>
+                    @appointment.Age
+                </td>
+                <td>
+                    @appointment.AppointmentDateTime
+                </td>
+                <td>
+                    @appointment.appStatus
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
