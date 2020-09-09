@@ -10,6 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ddac7.Controllers
 {
@@ -99,6 +103,46 @@ namespace ddac7.Controllers
             }
 
             return View(clinic);
+        }
+
+        public ActionResult AddAppointment()
+        {
+            return View();
+        }
+
+        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime")] Appointment app)
+        {
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
+            IConfigurationRoot Configuration = builder.Build();
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration["ConnectionStrings:StorageConnectionString"]);
+
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            CloudTable table = tableClient.GetTableReference("AppointmentTable");
+
+            var userid = _userManager.GetUserId(User);
+
+            var createAppointment = new Appointment
+            {
+                PartitionKey = "Clinic Caring", //要改
+                RowKey = "C002",
+                Name = app.Name,
+                Age = app.Age,
+                AppointmentDateTime = app.AppointmentDateTime,
+                userID = userid
+        };
+
+            try
+            {
+                TableOperation insertOperation = TableOperation.Insert(createAppointment);
+                TableResult result = table.ExecuteAsync(insertOperation).Result;
+            }
+            catch (Exception ex)
+            {
+                ViewBag.TableName = table.Name;
+                ViewBag.Msg = "Unable to insert data into table. Error = " + ex.ToString();
+            }
+
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
