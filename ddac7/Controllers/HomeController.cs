@@ -110,25 +110,57 @@ namespace ddac7.Controllers
             ViewBag.clinicId = id;
             return View();
         }
-
-        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,clinicID")] Appointment app)
+        public CloudTable TableStorage(String tableName)
         {
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
             IConfigurationRoot Configuration = builder.Build();
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
-
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-            CloudTable table = tableClient.GetTableReference("AppointmentTable");
+            CloudTable table = tableClient.GetTableReference(tableName);
+            return table;
+        }
 
+        public List<Appointment> GetAppointmentsList(CloudTable table) {
+           
+            TableQuery<Appointment> query = new TableQuery<Appointment>();
+            List<Appointment> appointments = new List<Appointment>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Appointment> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+                foreach (Appointment apps in resultSegment.Results)
+                {
+                    appointments.Add(apps);
+                }
+            }
+            while (token != null);
+
+            return appointments;
+        }
+        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,clinicID")] Appointment app)
+        {
+            CloudTable table = TableStorage("AppointmentTable");
             var userid = _userManager.GetUserId(User);
             var clinicName =(from a in _context.Clinic
                          where a.Id.Equals(app.clinicID)
                          select a.ClinicName).Single();
 
+            List<Appointment> appointments = GetAppointmentsList(table);
+            int c = appointments.Count();
+            string rowkey = "";
+
+            if(c<10)
+            rowkey = "C00" + (appointments.Count()+1).ToString(); 
+            else if(c>10&&c<100)
+            rowkey = "C0" + (appointments.Count() + 1).ToString();
+            else 
+            rowkey = "C" + (appointments.Count() + 1).ToString();
+
             var createAppointment = new Appointment
             {
-                PartitionKey = clinicName, 
-                RowKey = "C002",
+                PartitionKey = clinicName,
+                RowKey = rowkey,
                 Name = app.Name,
                 Age = app.Age,
                 AppointmentDateTime = app.AppointmentDateTime,
@@ -154,16 +186,8 @@ namespace ddac7.Controllers
         public ActionResult ViewAppointmentRecord()
         {
             var userid = _userManager.GetUserId(User);
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
-            IConfigurationRoot Configuration = builder.Build();
-            CloudStorageAccount storageAccount =
-                CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
-            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
-            CloudTable table = tableClient.GetTableReference("AppointmentTable");
-
+            CloudTable table = TableStorage("AppointmentTable");
+           
             TableQuery<Appointment> query = new TableQuery<Appointment>()
                 .Where(TableQuery.GenerateFilterCondition("userID", QueryComparisons.Equal, userid));
 
