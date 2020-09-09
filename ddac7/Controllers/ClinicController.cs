@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace ddac7.Controllers
 {
@@ -329,6 +332,127 @@ namespace ddac7.Controllers
             }
             return View(clinic);
 
+        }
+
+        public CloudTable TableStorage(String tableName)
+        {
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
+            IConfigurationRoot Configuration = builder.Build();
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            CloudTable table = tableClient.GetTableReference(tableName);
+            return table;
+        }
+
+        public ActionResult PendingAppointment()
+        {
+            var userId = _userManager.GetUserId(User);
+            var clinicName = (from a in _context.Clinic
+                              where a.UserID.Equals(userId)
+                              select a.ClinicName).Single();
+
+            CloudTable table = TableStorage("AppointmentTable");
+
+            string pendingList = TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicName),
+            TableOperators.And,
+            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Waiting for Approval")
+            );
+
+            TableQuery<Appointment> query = new TableQuery<Appointment>().Where(pendingList);
+
+
+           List <Appointment> appointments = new List<Appointment>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Appointment> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+
+                foreach (Appointment app in resultSegment.Results)
+                {
+                    appointments.Add(app);
+                }
+            }
+            while (token != null);
+
+            return View(appointments);
+        }
+
+        public async Task<ActionResult> Approve (string PartitionKey, string RowKey)
+        {
+            await EditTable(PartitionKey, RowKey, "Approve");
+            return RedirectToAction("PendingAppointment", "Clinic");
+        }
+
+        public async Task<ActionResult> Reject(string PartitionKey, string RowKey)
+        {
+            await EditTable(PartitionKey, RowKey, "Reject");
+            return RedirectToAction("PendingAppointment", "Clinic");
+        }
+
+        public async Task<ActionResult> EditTable(string PartitionKey, string RowKey, string status)
+        {
+            CloudTable table = TableStorage("AppointmentTable");
+            TableOperation retrieveOperation = TableOperation.Retrieve<Appointment>(PartitionKey, RowKey);
+            TableResult result = table.ExecuteAsync(retrieveOperation).Result;
+            Appointment updateEntity = (Appointment)result.Result;
+
+            if (updateEntity != null)
+            {
+                //Change the description
+                updateEntity.appStatus = status;
+
+                // Create the InsertOrReplace TableOperation
+                TableOperation update = TableOperation.Replace(updateEntity);
+
+                // Execute the operation.
+                await table.ExecuteAsync(update);
+            }
+
+            return RedirectToAction("PendingAppointment", "Clinic");
+        }
+
+
+
+        public ActionResult CompleteAppointment()
+        {
+            var userId = _userManager.GetUserId(User);
+            var clinicName = (from a in _context.Clinic
+                              where a.UserID.Equals(userId)
+                              select a.ClinicName).Single();
+
+            CloudTable table = TableStorage("AppointmentTable");
+
+            string completeList = TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Reject"),
+            TableOperators.Or,
+            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Approve")
+            );
+
+            string completeList2 = TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicName),
+            TableOperators.And,
+            completeList
+            );
+
+            TableQuery<Appointment> query = new TableQuery<Appointment>().Where(completeList2);
+
+            List<Appointment> appointments = new List<Appointment>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Appointment> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+
+                foreach (Appointment app in resultSegment.Results)
+                {
+                    appointments.Add(app);
+                }
+            }
+            while (token != null);
+
+            return View(appointments);
         }
     }
 }
