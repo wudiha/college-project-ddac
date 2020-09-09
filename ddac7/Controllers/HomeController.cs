@@ -105,31 +105,37 @@ namespace ddac7.Controllers
             return View(clinic);
         }
 
-        public ActionResult AddAppointment()
+        public ActionResult AddAppointment(int? id)
         {
+            ViewBag.clinicId = id;
             return View();
         }
 
-        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime")] Appointment app)
+        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,clinicID")] Appointment app)
         {
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
             IConfigurationRoot Configuration = builder.Build();
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration["ConnectionStrings:StorageConnectionString"]);
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
 
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             CloudTable table = tableClient.GetTableReference("AppointmentTable");
 
             var userid = _userManager.GetUserId(User);
+            var clinicName =(from a in _context.Clinic
+                         where a.Id.Equals(app.clinicID)
+                         select a.ClinicName).Single();
 
             var createAppointment = new Appointment
             {
-                PartitionKey = "Clinic Caring", //要改
+                PartitionKey = clinicName, 
                 RowKey = "C002",
                 Name = app.Name,
                 Age = app.Age,
                 AppointmentDateTime = app.AppointmentDateTime,
-                userID = userid
-        };
+                userID = userid,
+                clinicID = app.clinicID,
+                appStatus = "Waiting for Approval"
+            };
 
             try
             {
@@ -142,7 +148,40 @@ namespace ddac7.Controllers
                 ViewBag.Msg = "Unable to insert data into table. Error = " + ex.ToString();
             }
 
-            return View();
+            return RedirectToAction("ViewAppointmentRecord", "Home");
+        }
+
+        public ActionResult ViewAppointmentRecord()
+        {
+            var userid = _userManager.GetUserId(User);
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+            IConfigurationRoot Configuration = builder.Build();
+            CloudStorageAccount storageAccount =
+                CloudStorageAccount.Parse(Configuration["ConnectionStrings:AzureStorageConnectionString-1"]);
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            CloudTable table = tableClient.GetTableReference("AppointmentTable");
+
+            TableQuery<Appointment> query = new TableQuery<Appointment>()
+                .Where(TableQuery.GenerateFilterCondition("userID", QueryComparisons.Equal, userid));
+
+            List<Appointment> appointments = new List<Appointment>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Appointment> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+
+                foreach (Appointment app in resultSegment.Results)
+                {
+                    appointments.Add(app);
+                }
+            }
+            while (token != null);
+
+            return View(appointments);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

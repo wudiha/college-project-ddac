@@ -17,15 +17,23 @@ namespace ddac7.Models
 
         public Appointment() { }
 
+        [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
 
+        [Required]
+        [Range(1, 150)]
         [Display(Name = "Age")]
         public int Age { get; set; }
 
+        [Required]
         [Display(Name = "Date")]
         public DateTime AppointmentDateTime { get; set; }
 
         public string userID { get; set; }
+
+        public int clinicID { get; set; }
+
+        public string appStatus { get; set; }
     }
 }
