@@ -454,5 +454,38 @@ namespace ddac7.Controllers
 
             return View(appointments);
         }
+
+        public ActionResult SearchForAppointment()
+        {
+            var userId = _userManager.GetUserId(User);
+            var clinicName = (from a in _context.Clinic
+                              where a.UserID.Equals(userId)
+                              select a.ClinicName).Single();
+            ViewBag.ClinicName = clinicName;
+            return View();
+        }
+
+        public ActionResult GetAppointment(string PartitionName, string RowName)
+        {
+            try
+            {
+                CloudTable table = TableStorage("AppointmentTable");
+
+                TableOperation retrieveOperation = TableOperation.Retrieve<Appointment>(PartitionName, RowName);
+
+                TableResult result = table.ExecuteAsync(retrieveOperation).Result;
+
+                if (result.Etag != null)
+                    return View(result);
+                else
+                    TempData["message"] = "There is no record for Appointment ID: " + RowName + ", please re-enter the Appointment ID.";
+                    return RedirectToAction("SearchForAppointment", "Clinic");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.msg = "Error: " + ex.ToString();
+            }
+            return View();
+        }
     }
 }
