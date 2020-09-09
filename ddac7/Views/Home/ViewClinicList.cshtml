@@ -19,6 +19,7 @@
             <th>@Html.DisplayNameFor(model => model.ContactNum)</th>
             <th>@Html.DisplayNameFor(model => model.ContactEmail)</th>
             <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,9 @@
                 </td>
                 <td>
                     <a asp-action="ClinicDetails" asp-route-id="@item.Id">Details</a>
+                </td>
+                 <td>
+                    <a asp-action="AddAppointment" asp-route-id="@item.Id">Make Appointment</a>
                 </td>
             </tr>
         }
