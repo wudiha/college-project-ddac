@@ -15,7 +15,7 @@
     {
 
         var x = @item.ToString();
-        var url = x.Replace("https://clinicappointmentdev.blob.core.windows.net/doctor/", "");
+        var url = x.Replace("https://clinicappointmentdev2.blob.core.windows.net/doctor/", "");
 
        // <a href="@item" target="_blank"><img class="thumb" src="@item" alt="images" /></a><br />
 
@@ -32,7 +32,7 @@
                 @foreach (var item in Model.profileImage)
                 {
                     var x = @item.ToString();
-                    var url = x.Replace("https://clinicappointmentdev.blob.core.windows.net/doctor/", "");
+                    var url = x.Replace("https://clinicappointmentdev2.blob.core.windows.net/doctor/", "");
                     <li>
                         <div class="flip">
 
@@ -50,8 +50,10 @@
                                             {
                                                 if (items.imgurl != null)
                                                 {
+                                                    
                                                     if (items.imgurl.Equals(@url))
                                                     {
+
                                                         <h3>
                                                             @items.DoctorName
                                                         </h3>
