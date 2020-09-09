@@ -138,12 +138,12 @@ namespace ddac7.Controllers
 
             return appointments;
         }
-        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,clinicID")] Appointment app)
+        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,PartitionKey")] Appointment app)
         {
             CloudTable table = TableStorage("AppointmentTable");
             var userid = _userManager.GetUserId(User);
             var clinicName =(from a in _context.Clinic
-                         where a.Id.Equals(app.clinicID)
+                         where a.Id.ToString().Equals(app.PartitionKey)
                          select a.ClinicName).Single();
 
             List<Appointment> appointments = GetAppointmentsList(table);
@@ -159,13 +159,13 @@ namespace ddac7.Controllers
 
             var createAppointment = new Appointment
             {
-                PartitionKey = clinicName,
+                PartitionKey = app.PartitionKey,
                 RowKey = rowkey,
                 Name = app.Name,
                 Age = app.Age,
                 AppointmentDateTime = app.AppointmentDateTime,
                 userID = userid,
-                clinicID = app.clinicID,
+                clinicName = clinicName,
                 appStatus = "Waiting for Approval"
             };
 

@@ -9,9 +9,9 @@ namespace ddac7.Models
 {
     public class Appointment : TableEntity
     {
-        public Appointment(string clinicName, string appId)
+        public Appointment(int clinicID, string appId)
         {
-            this.PartitionKey = clinicName;
+            this.PartitionKey = clinicID.ToString();
             this.RowKey = appId;
         }
 
@@ -32,7 +32,7 @@ namespace ddac7.Models
 
         public string userID { get; set; }
 
-        public int clinicID { get; set; }
+        public string clinicName { get; set; }
 
         public string appStatus { get; set; }
     }

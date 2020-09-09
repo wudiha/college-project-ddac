@@ -23,7 +23,7 @@
         <input asp-for="AppointmentDateTime" class="form-control" />
         <span asp-validation-for="AppointmentDateTime" class="text-danger"></span>
     </div>
-    <input asp-for="clinicID" type="hidden" class="form-control" value="@ViewBag.clinicId" />
+    <input asp-for="PartitionKey" type="hidden" class="form-control" value="@ViewBag.clinicId" />
     <div class="form-group">
         <input type="submit" value="Create" class="btn btn-default" />
     </div>

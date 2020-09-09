@@ -22,7 +22,7 @@ namespace ddac7.Controllers
         private readonly UserManager<ClinicAppUser> _userManager;
         private readonly AuthDbContext _context;
         private readonly IBlobService _azureBlobService;
-        private  static IFormFileCollection FILES;
+        private static IFormFileCollection FILES;
 
         [HttpPost]
         public async Task<ActionResult> UploadAsync()
@@ -39,7 +39,7 @@ namespace ddac7.Controllers
                 {
                     return BadRequest("Could not upload empty files");
                 }
-                if (AzureBlobService.sss!=null)
+                if (AzureBlobService.sss != null)
                 {
                     String url = "https://clinicappointmentdev.blob.core.windows.net/doctor/";
                     url += AzureBlobService.sss;
@@ -119,7 +119,7 @@ namespace ddac7.Controllers
                 ViewData["trace"] = ex.StackTrace;
                 return View("Error");
             }
-           
+
         }
 
 
@@ -143,7 +143,7 @@ namespace ddac7.Controllers
         public async Task<IActionResult> AddDoctor()
         {
 
-            
+
             var model = new BlobModel();
             var result = (from a in _context.Doctor
                           select new BlobModel()
@@ -152,11 +152,11 @@ namespace ddac7.Controllers
                               DoctorName = a.DoctorName,
                               DoctorContactNumber = a.DoctorContactNumber,
                               imgurl = a.profileImage
-                             
+
                           }).ToList();
 
             model.doctor = result;
-            
+
             model.profileImage = await _azureBlobService.ListAsync("view");
             if (model.profileImage.Count().Equals(0))
             {
@@ -165,7 +165,7 @@ namespace ddac7.Controllers
             //dynamic mymodel = new ExpandoObject();
 
             return View(model);
-           
+
         }
 
         //
@@ -176,7 +176,7 @@ namespace ddac7.Controllers
         {
             if (ModelState.IsValid)
             {
-                
+
                 var currentUser = await _userManager.GetUserAsync(User);
                 var userId = currentUser.Id;
 
@@ -197,7 +197,7 @@ namespace ddac7.Controllers
 
                 _context.Add(addDoctor);
                 await _context.SaveChangesAsync();
-               
+
                 TempData["message"] = "Doctor " + doctor.DoctorName + " has been created.";
 
                 return RedirectToAction("Index");
@@ -206,23 +206,23 @@ namespace ddac7.Controllers
             return View();
 
         }
-       
+
         public async Task<IActionResult> TestView()
         {
             try
             {
-                
+
 
                 var model = new BlobModel();
                 model.profileImage = await _azureBlobService.ListAsync("add");
-                if(model.profileImage.Count().Equals(0))
+                if (model.profileImage.Count().Equals(0))
                 {
                     AzureBlobService.sss = null;
                 }
                 //dynamic mymodel = new ExpandoObject();
-            
-                
-                
+
+
+
                 return View(model);
             }
             catch (Exception ex)
@@ -308,9 +308,20 @@ namespace ddac7.Controllers
         {
             if (ModelState.IsValid)
             {
-                    _context.Update(clinic);
-                    TempData["message"] = "Your clinic details has been updated.";
-                    await _context.SaveChangesAsync();
+                CloudTable table = TableStorage("AppointmentTable");
+                List<Appointment> appointments = Common.GetAppointmentsList(table);
+
+                foreach (var item in appointments)
+                {
+                    if (item.PartitionKey.Equals(clinic.Id.ToString()))
+                    {
+                        
+                        await EditTable(item.PartitionKey, item.RowKey, null, clinic.ClinicName);
+                    }
+                }
+                _context.Update(clinic);
+                TempData["message"] = "Your clinic details has been updated.";
+                await _context.SaveChangesAsync();
 
                 return RedirectToAction("ManageClinic", new { uID = clinic.UserID });
             }
@@ -347,14 +358,14 @@ namespace ddac7.Controllers
         public ActionResult PendingAppointment()
         {
             var userId = _userManager.GetUserId(User);
-            var clinicName = (from a in _context.Clinic
-                              where a.UserID.Equals(userId)
-                              select a.ClinicName).Single();
-
+         
+            var clinicID = (from a in _context.Clinic
+                            where a.UserID.Equals(userId)
+                            select a.Id).Single();
             CloudTable table = TableStorage("AppointmentTable");
 
             string pendingList = TableQuery.CombineFilters(
-            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicName),
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()),
             TableOperators.And,
             TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Waiting for Approval")
             );
@@ -362,7 +373,7 @@ namespace ddac7.Controllers
             TableQuery<Appointment> query = new TableQuery<Appointment>().Where(pendingList);
 
 
-           List <Appointment> appointments = new List<Appointment>();
+            List<Appointment> appointments = new List<Appointment>();
             TableContinuationToken token = null;
             do
             {
@@ -379,19 +390,19 @@ namespace ddac7.Controllers
             return View(appointments);
         }
 
-        public async Task<ActionResult> Approve (string PartitionKey, string RowKey)
+        public async Task<ActionResult> Approve(string PartitionKey, string RowKey)
         {
-            await EditTable(PartitionKey, RowKey, "Approve");
+            await EditTable(PartitionKey, RowKey, "Approve", null);
             return RedirectToAction("PendingAppointment", "Clinic");
         }
 
         public async Task<ActionResult> Reject(string PartitionKey, string RowKey)
         {
-            await EditTable(PartitionKey, RowKey, "Reject");
+            await EditTable(PartitionKey, RowKey, "Reject", null);
             return RedirectToAction("PendingAppointment", "Clinic");
         }
 
-        public async Task<ActionResult> EditTable(string PartitionKey, string RowKey, string status)
+        public async Task<ActionResult> EditTable(string PartitionKey, string RowKey, string status, string edited_clinic)
         {
             CloudTable table = TableStorage("AppointmentTable");
             TableOperation retrieveOperation = TableOperation.Retrieve<Appointment>(PartitionKey, RowKey);
@@ -401,8 +412,10 @@ namespace ddac7.Controllers
             if (updateEntity != null)
             {
                 //Change the description
-                updateEntity.appStatus = status;
-
+                if (status != null)
+                    updateEntity.appStatus = status;
+                if (edited_clinic != null)
+                    updateEntity.clinicName = edited_clinic;
                 // Create the InsertOrReplace TableOperation
                 TableOperation update = TableOperation.Replace(updateEntity);
 
@@ -418,10 +431,10 @@ namespace ddac7.Controllers
         public ActionResult CompleteAppointment()
         {
             var userId = _userManager.GetUserId(User);
-            var clinicName = (from a in _context.Clinic
-                              where a.UserID.Equals(userId)
-                              select a.ClinicName).Single();
-
+            
+            var clinicID = (from a in _context.Clinic
+                            where a.UserID.Equals(userId)
+                            select a.Id).Single();
             CloudTable table = TableStorage("AppointmentTable");
 
             string completeList = TableQuery.CombineFilters(
@@ -431,7 +444,7 @@ namespace ddac7.Controllers
             );
 
             string completeList2 = TableQuery.CombineFilters(
-            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicName),
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()),
             TableOperators.And,
             completeList
             );
@@ -479,7 +492,7 @@ namespace ddac7.Controllers
                     return View(result);
                 else
                     TempData["message"] = "There is no record for Appointment ID: " + RowName + ", please re-enter the Appointment ID.";
-                    return RedirectToAction("SearchForAppointment", "Clinic");
+                return RedirectToAction("SearchForAppointment", "Clinic");
             }
             catch (Exception ex)
             {
