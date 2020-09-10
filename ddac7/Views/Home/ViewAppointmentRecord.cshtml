@@ -42,5 +42,12 @@
 
             </tr>
         }
-        </tbody>
+    </tbody>
 </table>
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}

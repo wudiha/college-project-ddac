@@ -173,11 +173,15 @@ namespace ddac7.Controllers
             {
                 TableOperation insertOperation = TableOperation.Insert(createAppointment);
                 TableResult result = table.ExecuteAsync(insertOperation).Result;
+                if (result.Etag != null)
+                {
+                    TempData["message"] = "Your appointment request is now waiting for approval.";
+                    return RedirectToAction("ViewAppointmentRecord", "Home");
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.TableName = table.Name;
-                ViewBag.Msg = "Unable to insert data into table. Error = " + ex.ToString();
+                TempData["message"] = "Unable to send your appointment request, Error: " + ex.ToString(); ;
             }
 
             return RedirectToAction("ViewAppointmentRecord", "Home");

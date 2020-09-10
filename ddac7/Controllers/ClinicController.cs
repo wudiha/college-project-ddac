@@ -393,12 +393,14 @@ namespace ddac7.Controllers
         public async Task<ActionResult> Approve(string PartitionKey, string RowKey)
         {
             await EditTable(PartitionKey, RowKey, "Approve", null);
+            TempData["message"] = "Appointment ID: " + RowKey + " status has updated to Approve.";
             return RedirectToAction("PendingAppointment", "Clinic");
         }
 
         public async Task<ActionResult> Reject(string PartitionKey, string RowKey)
         {
             await EditTable(PartitionKey, RowKey, "Reject", null);
+            TempData["message"] = "Appointment ID: " + RowKey + " status has updated to Reject.";
             return RedirectToAction("PendingAppointment", "Clinic");
         }
 

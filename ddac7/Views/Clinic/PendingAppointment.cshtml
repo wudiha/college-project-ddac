@@ -22,47 +22,54 @@
     <tbody>
         @foreach (var appointment in Model)
         {
-        <tr>
-            <td>
-                @appointment.clinicName
-            </td>
-            <td>
-                @appointment.RowKey
-            </td>
-            <td>
-                @appointment.Name
-            </td>
-            <td>
-                @appointment.Age
-            </td>
-            <td>
-                @appointment.AppointmentDateTime
-            </td>
-            <td>
-                @appointment.appStatus
-            </td>
-            <td>
-                @{
-                    var parms = new Dictionary<string, string>
-                            {
-                                {"partitionkey", appointment.PartitionKey },
-                                {"rowkey", appointment.RowKey }
-                            };
-                }
-                <a asp-area="" asp-controller="Clinic" asp-action="Approve" asp-all-route-data="parms"><button>Approve</button></a>
-            </td>
-            <td>
-                @{
-                    var parms1 = new Dictionary<string, string>
-                            {
-                                {"partitionkey", appointment.PartitionKey },
-                                {"rowkey", appointment.RowKey },
-                            };
-                }
-                <a asp-area="" asp-controller="Clinic" asp-action="Reject" asp-all-route-data="parms1"><button>Reject</button></a>
-            </td>
+            <tr>
+                <td>
+                    @appointment.clinicName
+                </td>
+                <td>
+                    @appointment.RowKey
+                </td>
+                <td>
+                    @appointment.Name
+                </td>
+                <td>
+                    @appointment.Age
+                </td>
+                <td>
+                    @appointment.AppointmentDateTime
+                </td>
+                <td>
+                    @appointment.appStatus
+                </td>
+                <td>
+                    @{
+                        var parms = new Dictionary<string, string>
+                                    {
+                                        {"partitionkey", appointment.PartitionKey },
+                                        {"rowkey", appointment.RowKey }
+                                    };
+                    }
+                    <a asp-area="" asp-controller="Clinic" asp-action="Approve" asp-all-route-data="parms"><button>Approve</button></a>
+                </td>
+                <td>
+                    @{
+                        var parms1 = new Dictionary<string, string>
+                                    {
+                                        {"partitionkey", appointment.PartitionKey },
+                                        {"rowkey", appointment.RowKey },
+                                    };
+                    }
+                    <a asp-area="" asp-controller="Clinic" asp-action="Reject" asp-all-route-data="parms1"><button>Reject</button></a>
+                </td>
 
-        </tr>
+            </tr>
         }
-        </tbody>
+    </tbody>
 </table>
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}
