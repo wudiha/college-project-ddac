@@ -471,10 +471,10 @@ namespace ddac7.Controllers
         public ActionResult SearchForAppointment()
         {
             var userId = _userManager.GetUserId(User);
-            var clinicName = (from a in _context.Clinic
+            var clinicId = (from a in _context.Clinic
                               where a.UserID.Equals(userId)
-                              select a.ClinicName).Single();
-            ViewBag.ClinicName = clinicName;
+                              select a.Id).Single();
+            ViewBag.ClinicId = clinicId;
             return View();
         }
 
