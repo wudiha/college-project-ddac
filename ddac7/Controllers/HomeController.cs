@@ -192,7 +192,7 @@ namespace ddac7.Controllers
         {
             var userid = _userManager.GetUserId(User);
             CloudTable table = TableStorage("AppointmentTable");
-           
+
             TableQuery<Appointment> query = new TableQuery<Appointment>()
                 .Where(TableQuery.GenerateFilterCondition("userID", QueryComparisons.Equal, userid));
 
@@ -212,6 +212,117 @@ namespace ddac7.Controllers
 
             return View(appointments);
         }
+
+        public ActionResult ViewCompletedRecord()
+        {
+            var userid = _userManager.GetUserId(User);
+            CloudTable table = TableStorage("AppointmentTable");
+
+            string completedList = TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("userID", QueryComparisons.Equal, userid),
+            TableOperators.And,
+            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Completed")
+            );
+
+            TableQuery<Appointment> query = new TableQuery<Appointment>().Where(completedList);
+
+            List<Appointment> appointments = new List<Appointment>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Appointment> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+
+                foreach (Appointment app in resultSegment.Results)
+                {
+                    appointments.Add(app);
+                }
+            }
+            while (token != null);
+
+            return View(appointments);
+        }
+
+        public List<Feedback> GetFeedbacksList(CloudTable table)
+        {
+
+            TableQuery<Feedback> query = new TableQuery<Feedback>();
+            List<Feedback> feedbacks = new List<Feedback>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Feedback> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+                foreach (Feedback fb in resultSegment.Results)
+                {
+                    feedbacks.Add(fb);
+                }
+            }
+            while (token != null);
+
+            return feedbacks;
+        }
+
+        public IActionResult Feedback()
+        {
+            //data pass when the button click
+            string clinicId = Request.Form["clinicId"];
+            string patientName = Request.Form["patientName"];
+            string appId = Request.Form["appId"];
+            ViewBag.clinicId = clinicId;
+            ViewBag.patientName = patientName;
+            ViewBag.appId = appId;
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendFeedback(int id, [Bind("Name,appId,PartitionKey,FeedbackDetails")] Feedback fb)
+        {
+            CloudTable table = TableStorage("FeedbackTable");
+            var userid = _userManager.GetUserId(User);
+
+            List<Feedback> feedbacks = GetFeedbacksList(table);
+            int f = feedbacks.Count();
+            string rowkey = "";
+
+            if (f + 1 < 10)
+                rowkey = "F00" + (feedbacks.Count() + 1).ToString();
+            else if (f + 1 > 10 && f + 1 < 100)
+                rowkey = "F0" + (feedbacks.Count() + 1).ToString();
+            else
+                rowkey = "F" + (feedbacks.Count() + 1).ToString();
+
+            var createFeedback = new Feedback
+            {
+                PartitionKey = fb.PartitionKey,
+                RowKey = rowkey,
+                appId = fb.appId,
+                Name = fb.Name,
+                FeedbackDetails = fb.FeedbackDetails,
+                userID = userid
+            };
+
+            try
+            {
+                TableOperation insertOperation = TableOperation.Insert(createFeedback);
+                TableResult result = table.ExecuteAsync(insertOperation).Result;
+                if (result.Etag != null)
+                {
+                    TempData["message"] = "Your Feedback has sended.";
+                    return RedirectToAction("ViewCompletedRecord", "Home");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["message"] = "Unable to send your appointment request, Error: " + ex.ToString(); ;
+            }
+
+            return RedirectToAction("ViewAppointmentRecord", "Home");
+
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

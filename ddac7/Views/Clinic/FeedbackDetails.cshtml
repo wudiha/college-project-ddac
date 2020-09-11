@@ -1,0 +1,51 @@
+﻿@model Microsoft.WindowsAzure.Storage.Table.TableResult
+@{
+    ViewData["Title"] = "FeedbackDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Feedback Details:</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => (Model.Result as ddac7.Models.Feedback).appId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => (Model.Result as ddac7.Models.Feedback).appId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => (Model.Result as ddac7.Models.Feedback).Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => (Model.Result as ddac7.Models.Feedback).Name)
+        </dd>
+        <dt>
+            Feedback Details:
+        </dt>
+        <dd>
+            <span>@Html.DisplayFor(model => (Model.Result as ddac7.Models.Feedback).FeedbackDetails)</span>
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="FeedbackReceived">Back to List</a>
+</div>
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}
+
+<style>
+    span {
+        display: block;
+        width: 60%;
+        word-wrap: break-word;
+    }
+
+</style>

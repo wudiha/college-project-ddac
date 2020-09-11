@@ -1,0 +1,39 @@
+﻿@model ddac7.Models.Feedback
+@{
+    ViewData["Title"] = "Feedback";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Feedback</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SendFeedback">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="appId" class="control-label"></label>
+                <input asp-for="appId" class="form-control" value="@ViewBag.appId" readonly />
+                <span asp-validation-for="appId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" value="@ViewBag.patientName" readonly />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FeedbackDetails" class="control-label"></label>
+                <textarea asp-for="FeedbackDetails" class="form-control"></textarea>
+                <span asp-validation-for="FeedbackDetails" class="text-danger"></span>
+            </div>
+            <input asp-for="PartitionKey" class="form-control" value="@ViewBag.clinicId" type="hidden" />
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -404,6 +404,13 @@ namespace ddac7.Controllers
             return RedirectToAction("PendingAppointment", "Clinic");
         }
 
+        public async Task<ActionResult> Completed(string PartitionKey, string RowKey)
+        {
+            await EditTable(PartitionKey, RowKey, "Completed", null);
+            TempData["message"] = "Appointment ID: " + RowKey + " status has updated to Completed.";
+            return RedirectToAction("CompleteAppointment", "Clinic");
+        }
+
         public async Task<ActionResult> EditTable(string PartitionKey, string RowKey, string status, string edited_clinic)
         {
             CloudTable table = TableStorage("AppointmentTable");
@@ -443,18 +450,12 @@ namespace ddac7.Controllers
             CloudTable table = TableStorage("AppointmentTable");
 
             string completeList = TableQuery.CombineFilters(
-            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Reject"),
-            TableOperators.Or,
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()),
+            TableOperators.And,
             TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Approve")
             );
 
-            string completeList2 = TableQuery.CombineFilters(
-            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()),
-            TableOperators.And,
-            completeList
-            );
-
-            TableQuery<Appointment> query = new TableQuery<Appointment>().Where(completeList2);
+            TableQuery<Appointment> query = new TableQuery<Appointment>().Where(completeList);
 
             List<Appointment> appointments = new List<Appointment>();
             TableContinuationToken token = null;
@@ -504,6 +505,97 @@ namespace ddac7.Controllers
                 ViewBag.msg = "Error: " + ex.ToString();
             }
             return View();
+        }
+
+        public ActionResult HistoryAppointment()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var clinicID = (from a in _context.Clinic
+                            where a.UserID.Equals(userId)
+                            select a.Id).Single();
+            CloudTable table = TableStorage("AppointmentTable");
+
+            string historyList = TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()),
+            TableOperators.And,
+            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Completed")
+            );
+
+            TableQuery<Appointment> query = new TableQuery<Appointment>().Where(historyList);
+
+            List<Appointment> appointments = new List<Appointment>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Appointment> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+
+                foreach (Appointment app in resultSegment.Results)
+                {
+                    appointments.Add(app);
+                }
+            }
+            while (token != null);
+
+            return View(appointments);
+        }
+
+        public ActionResult FeedbackReceived()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            var clinicID = (from a in _context.Clinic
+                            where a.UserID.Equals(userId)
+                            select a.Id).Single();
+
+            CloudTable table = TableStorage("FeedbackTable");
+
+            string feedbackList = TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()),
+            TableOperators.And,
+            TableQuery.GenerateFilterCondition("appStatus", QueryComparisons.Equal, "Waiting for Approval")
+            );
+
+            TableQuery<Feedback> query = new TableQuery<Feedback>()
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, clinicID.ToString()));
+
+
+            List<Feedback> feedbacks = new List<Feedback>();
+            TableContinuationToken token = null;
+            do
+            {
+                TableQuerySegment<Feedback> resultSegment = table.ExecuteQuerySegmentedAsync(query, token).Result;
+                token = resultSegment.ContinuationToken;
+
+                foreach (Feedback fb in resultSegment.Results)
+                {
+                    feedbacks.Add(fb);
+                }
+            }
+            while (token != null);
+
+            return View(feedbacks);
+        }
+
+        public ActionResult FeedbackDetails(string PartitionKey, string RowKey)
+        {
+            try
+            {
+                CloudTable table = TableStorage("FeedbackTable");
+
+                TableOperation retrieveOperation = TableOperation.Retrieve<Feedback>(PartitionKey, RowKey);
+
+                TableResult result = table.ExecuteAsync(retrieveOperation).Result;
+
+                return View(result);
+            }
+            catch (Exception ex)
+            {
+                TempData["message"] = "There is an error occured. Error: " + ex.ToString();
+                return View();
+            }
+
         }
     }
 }
