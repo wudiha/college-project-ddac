@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ddac7</title>
+    <title>TEBEST -@ViewData["Title"]</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -29,7 +29,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">ddac7</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">TEBEST</a>
                 <a asp-area="" asp-controller="Home" asp-action="AnotherTestView" class="navbar-brand">Test landing</a>
             </div>
             <div class="navbar-collapse collapse">
@@ -37,10 +37,12 @@
                     @if (User.IsInRole("Patient"))
                     {
                         <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-                        <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                         <li><a asp-area="" asp-controller="Home" asp-action="ViewClinicList">Clinic</a></li>
                         <li><a asp-area="" asp-controller="Home" asp-action="ViewAppointmentRecord">Appointment Record</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+
+
                     }
                     @if (User.IsInRole("Clinic"))
                     {
@@ -68,7 +70,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2020 - ddac7</p>
+            <p>&copy; 2020 - TEBEST APPOINTMENT SYSTEM</p>
         </footer>
     </div>
 

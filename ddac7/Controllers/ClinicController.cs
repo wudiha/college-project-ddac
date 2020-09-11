@@ -391,7 +391,7 @@ namespace ddac7.Controllers
         }
 
         public async Task<ActionResult> Approve(string PartitionKey, string RowKey)
-        {
+        {       
             await EditTable(PartitionKey, RowKey, "Approve", null);
             TempData["message"] = "Appointment ID: " + RowKey + " status has updated to Approve.";
             return RedirectToAction("PendingAppointment", "Clinic");
@@ -410,12 +410,15 @@ namespace ddac7.Controllers
             TableOperation retrieveOperation = TableOperation.Retrieve<Appointment>(PartitionKey, RowKey);
             TableResult result = table.ExecuteAsync(retrieveOperation).Result;
             Appointment updateEntity = (Appointment)result.Result;
-
+            
             if (updateEntity != null)
             {
                 //Change the description
                 if (status != null)
+                {
                     updateEntity.appStatus = status;
+                    await BusServiceQueue.SendQueueMsg(updateEntity.userID + "," + "Your Appointment: " + RowKey + " at " +updateEntity.clinicName +" has been approved."+","+"status");
+                }
                 if (edited_clinic != null)
                     updateEntity.clinicName = edited_clinic;
                 // Create the InsertOrReplace TableOperation

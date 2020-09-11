@@ -14,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.ServiceBus;
+using System.Threading;
+using System.Text;
 
 namespace ddac7.Controllers
 {
@@ -22,6 +25,11 @@ namespace ddac7.Controllers
     {
         private readonly UserManager<ClinicAppUser> _userManager;
         private readonly AuthDbContext _context;
+        private const string ServiceBusConnectionString = "Endpoint=sb://clinicappointment.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAZ+/oYPQFohQ9O2ZEoHopo0MAEgib8IgAjN5iEnNpM=";
+        const string QueueName = "testing";
+        static IQueueClient queueClient;
+        private string userid;
+        private static List<string> items;
 
         public HomeController(UserManager<ClinicAppUser> userManager, AuthDbContext context)
         {
@@ -29,15 +37,7 @@ namespace ddac7.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
-        {
-            if (User.IsInRole("Clinic")) 
-            {
-                return LocalRedirect("~/Clinic/Index");
-            }
-
-            return View();
-        }
+        
 
         public IActionResult About()
         {
@@ -138,7 +138,7 @@ namespace ddac7.Controllers
 
             return appointments;
         }
-        public ActionResult AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,PartitionKey")] Appointment app)
+        public async Task<ActionResult> AddAppointmentIntoTable([Bind("Name,Age,AppointmentDateTime,PartitionKey")] Appointment app)
         {
             CloudTable table = TableStorage("AppointmentTable");
             var userid = _userManager.GetUserId(User);
@@ -176,6 +176,7 @@ namespace ddac7.Controllers
                 if (result.Etag != null)
                 {
                     TempData["message"] = "Your appointment request is now waiting for approval.";
+                    await Services.BusServiceQueue.SendQueueMsg(userid+","+"Kindly reminder on your appointment at "+clinicName +" at "+app.AppointmentDateTime+","+app.AppointmentDateTime);
                     return RedirectToAction("ViewAppointmentRecord", "Home");
                 }
             }
@@ -216,6 +217,78 @@ namespace ddac7.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public async Task<IActionResult> ttview()
+        {
+
+            return View(items);
+        }
+
+
+
+        public async Task<IActionResult> Index()
+        {
+
+            if (User.IsInRole("Clinic"))
+            {
+                return LocalRedirect("~/Clinic/Index");
+            }
+            userid = _userManager.GetUserId(User);
+            //queueClient = new QueueClient(ServiceBusConnectionString, QueueName, ReceiveMode.PeekLock);
+            items = new List<string>();
+            var taskList = new List<Task>();
+
+            await Task.Run(() =>
+            {
+                queueClient = new QueueClient(ServiceBusConnectionString, QueueName, ReceiveMode.PeekLock);
+                var options = new MessageHandlerOptions(ExceptionMethod)
+                {
+                    MaxConcurrentCalls = 1,
+                    AutoComplete = false
+                };
+
+                queueClient.RegisterMessageHandler(ExecuteMessageProcessingAsync, options);
+            });
+
+            await Task.Delay(3000);
+            await queueClient.CloseAsync();
+            return RedirectToAction("ttview");
+
+        }
+
+        private async Task ExecuteMessageProcessingAsync(Message message, CancellationToken arg2)
+        {
+            DateTime now = DateTime.Now;
+
+
+            string[] tokens = Encoding.UTF8.GetString(message.Body).Split(',');
+            if (tokens[2].Equals("status"))
+            {
+                if (!tokens[0].Equals(userid)) return;
+            }
+            else
+            {
+                DateTime dt = DateTime.Parse(tokens[2]);
+                var result = dt.Subtract(now).TotalMinutes;
+
+                if (!tokens[0].Equals(userid) | !(result <= 60))
+                {
+                    //  await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+                    return;
+                }
+            }
+            items.Add(tokens[1].ToString());
+            await queueClient.CompleteAsync(message.SystemProperties.LockToken);
+            //items.Add("Received message: SequenceNumber:" + message.SystemProperties.SequenceNumber + " Body:" + Encoding.UTF8.GetString(message.Body));
+        }
+
+        //Part 2: Received Message from the Service Bus
+        private static async Task ExceptionMethod(ExceptionReceivedEventArgs arg)
+        {
+            await Task.Run(() =>
+           Console.WriteLine($"Error occured. Error is {arg.Exception.Message}")
+           );
         }
     }
 }
