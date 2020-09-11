@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<ddac7.Models.Appointment>
 @{
-    ViewData["Title"] = "CompleteAppointment";
+    ViewData["Title"] = "ViewCompletedRecord";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>ViewAppointmentRecord</h2>
+<h2>Appointment History</h2>
 
 <table class="table" border="1">
     <thead>
@@ -41,16 +41,24 @@
                 @appointment.appStatus
             </td>
             <td>
-                @{
-                    var parms = new Dictionary<string, string>
-                                        {
-                                            {"partitionkey", appointment.PartitionKey },
-                                            {"rowkey", appointment.RowKey }
-                                        };
+                @using (Html.BeginForm("Feedback", "Home"))
+                {
+                    <div class="form-group">
+                        <input type="hidden" name="clinicId" value="@appointment.PartitionKey" />
+                        <input type="hidden" name="patientName" value="@appointment.Name" />
+                        <input type="hidden" name="appId" value="@appointment.RowKey" />
+                        <input type="submit" class="btn btn-default" value="Feedback" style="color:blue" />
+                    </div>
                 }
-                <a asp-area="" asp-controller="Clinic" asp-action="Completed" asp-all-route-data="parms"><button>Completed</button></a>
             </td>
         </tr>
         }
     </tbody>
 </table>
+
+@if (TempData["message"] != null)
+{
+    <script>
+		alert("@TempData["message"]");
+    </script>
+}

@@ -1,0 +1,42 @@
+﻿@model IEnumerable<ddac7.Models.Feedback>
+@{
+    ViewData["Title"] = "FeedbackReceived";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>FeedbackReceived</h2>
+
+<h2>Appointment History:</h2>
+
+<table class="table" border="1">
+    <thead>
+        <tr bgcolor="lightblue">
+            <th>Appointment ID</th>
+            <th>Patient Name</th>
+            <th></th>
+        <tr>
+    </thead>
+    <tbody>
+        @foreach (var feedback in Model)
+        {
+        <tr>
+            <td>
+                @feedback.RowKey
+            </td>
+            <td>
+                @feedback.Name
+            </td>
+            <td>
+                @{
+                    var parms = new Dictionary<string, string>
+                             {
+                                   {"partitionkey", feedback.PartitionKey },
+                                   {"rowkey", feedback.RowKey }
+                             };
+                }
+                <a asp-area="" asp-controller="Clinic" asp-action="FeedbackDetails" asp-all-route-data="parms">View Feedback</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

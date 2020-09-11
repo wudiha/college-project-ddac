@@ -41,12 +41,16 @@
                         <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                         <li><a asp-area="" asp-controller="Home" asp-action="ViewClinicList">Clinic</a></li>
                         <li><a asp-area="" asp-controller="Home" asp-action="ViewAppointmentRecord">Appointment Record</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="ViewCompletedRecord">Completed Record</a></li>
                     }
                     @if (User.IsInRole("Clinic"))
                     {
                         <li><a asp-area="" asp-controller="Clinic" asp-action="Index">Home</a></li>
                         <li><a asp-area="" asp-controller="Clinic" asp-action="CreateClinic">Manage Clinic</a></li>
                         <li><a asp-area="" asp-controller="Clinic" asp-action="PendingAppointment">Pending Appointment</a></li>
+                        <li><a asp-area="" asp-controller="Clinic" asp-action="CompleteAppointment">Appointment List</a></li>
+                        <li><a asp-area="" asp-controller="Clinic" asp-action="HistoryAppointment">Appointment History</a></li>
+                        <li><a asp-area="" asp-controller="Clinic" asp-action="FeedbackReceived">Feedback</a></li>
                         <li><a asp-area="" asp-controller="Clinic" asp-action="SearchForAppointment">Search Appointment Record</a></li>
                     }
                     @if (User.IsInRole("Admin"))
