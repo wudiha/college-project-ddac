@@ -7,6 +7,7 @@
 }
 <h2>View doctor</h2>
 
+<link rel="stylesheet" href="~/css/test.css" />
 <hr />
 
 @if (Model.profileImage != null)
@@ -17,7 +18,7 @@
         var x = @item.ToString();
         var url = x.Replace("https://clinicappointmentdev2.blob.core.windows.net/doctor/", "");
 
-       // <a href="@item" target="_blank"><img class="thumb" src="@item" alt="images" /></a><br />
+        // <a href="@item" target="_blank"><img class="thumb" src="@item" alt="images" /></a><br />
 
 
 
@@ -38,7 +39,7 @@
 
 
                             <div class="front-side" style="background-image:url(@item)"></div>
-                            
+
                             <div class="back-side">
                                 <a href="#">
                                     <div class="content">
@@ -50,14 +51,20 @@
                                             {
                                                 if (items.imgurl != null)
                                                 {
-                                                    
+
                                                     if (items.imgurl.Equals(@url))
                                                     {
 
-                                                        <h3>
+                                                        <h3 style="text-decoration:none">
                                                             @items.DoctorName
+
                                                         </h3>
-                                                        <p>@items.DoctorContactNumber</p>
+                                                        <p>ContactNumber: @items.DoctorContactNumber</p>
+                                                        <p>Belongs to: @items.clinic_name</p>
+                                                            <br />                                         
+                                                      
+
+
                                                     }
                                                 }
                                             }
@@ -72,10 +79,10 @@
                         </div>
                     </li>
                 }}
-                </ul>
+        </ul>
         <br />
     </div>
-  
+
 
 
     @using (Html.BeginForm("DeleteAll", "Clinic", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -120,5 +127,5 @@
         html += "<div class='fileUpload btn btn-primary'><span>Upload</span><input type='submit' class='upload 'value='Upload'/></div>"
         document.getElementById("FilesToUpload").innerHTML = html;
     }
-
+   
 </script>
