@@ -23,6 +23,7 @@ namespace ddac7.Controllers
         private readonly AuthDbContext _context;
         private readonly IBlobService _azureBlobService;
         private static IFormFileCollection FILES;
+        private const string _BLOBURL = "https://clinicappointmentdev2.blob.core.windows.net/doctor/";
 
         [HttpPost]
         public async Task<ActionResult> UploadAsync()
@@ -39,10 +40,10 @@ namespace ddac7.Controllers
                 {
                     return BadRequest("Could not upload empty files");
                 }
-                if (AzureBlobService.sss != null)
+                if (AzureBlobService.blob_files != null)
                 {
-                    String url = "https://clinicappointmentdev.blob.core.windows.net/doctor/";
-                    url += AzureBlobService.sss;
+                    String url = _BLOBURL;
+                    url += AzureBlobService.blob_files;
                     await DeleteImage(url);
                     await DeleteImage2(url);
                 }
@@ -143,24 +144,37 @@ namespace ddac7.Controllers
         public async Task<IActionResult> AddDoctor()
         {
 
+            var userid = _userManager.GetUserId(User);
+            var clinicid = (from a in _context.Clinic
+                            where a.UserID.Equals(userid)
+                            select a.Id).Single();
+            var clinicname = (from a in _context.Clinic
+                            where a.Id.Equals(clinicid)
+                            select a.ClinicName).Single();
 
             var model = new BlobModel();
             var result = (from a in _context.Doctor
+                          where a.Clinic_Id.Equals(clinicid)
                           select new BlobModel()
                           {
                               id = a.id,
                               DoctorName = a.DoctorName,
                               DoctorContactNumber = a.DoctorContactNumber,
-                              imgurl = a.profileImage
-
+                              imgurl = a.profileImage,
+                              clinic_name = clinicname,
+                              clinic_id = clinicid
+                              
                           }).ToList();
 
             model.doctor = result;
+            if (result.Count() != 0)
+                model.profileImage = await _azureBlobService.ListAsync("view",model);
 
-            model.profileImage = await _azureBlobService.ListAsync("view");
+            else { AzureBlobService.blob_files = null; return View(model); }
+
             if (model.profileImage.Count().Equals(0))
             {
-                AzureBlobService.sss = null;
+                AzureBlobService.blob_files = null;
             }
             //dynamic mymodel = new ExpandoObject();
 
@@ -179,19 +193,23 @@ namespace ddac7.Controllers
 
                 var currentUser = await _userManager.GetUserAsync(User);
                 var userId = currentUser.Id;
-
+                var clinicid = (from a in _context.Clinic
+                                where a.UserID.Equals(userId)
+                                select a.Id).Single();
                 var addDoctor = new Doctor
                 {
                     DoctorName = doctor.DoctorName,
                     DoctorContactNumber = doctor.DoctorContactNumber,
-                    profileImage = AzureBlobService.sss,
-                    id = userId
+                    profileImage = AzureBlobService.blob_files,
+                    id = userId,
+                    Clinic_Id = clinicid
+                    
                 };
 
-                if (AzureBlobService.sss != null)
+                if (AzureBlobService.blob_files != null)
                 {
-                    String url = "https://clinicappointmentdev.blob.core.windows.net/doctor/";
-                    url += AzureBlobService.sss;
+                    String url = _BLOBURL;
+                    url += AzureBlobService.blob_files;
                     await DeleteImage(url);
                 }
 
@@ -214,10 +232,10 @@ namespace ddac7.Controllers
 
 
                 var model = new BlobModel();
-                model.profileImage = await _azureBlobService.ListAsync("add");
+                model.profileImage = await _azureBlobService.ListAsync("add",model);
                 if (model.profileImage.Count().Equals(0))
                 {
-                    AzureBlobService.sss = null;
+                    AzureBlobService.blob_files = null;
                 }
                 //dynamic mymodel = new ExpandoObject();
 
@@ -301,7 +319,7 @@ namespace ddac7.Controllers
             return View();
 
         }
-
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ClinicName,ClinicDesc,ContactNum,ContactEmail,Status,UserID")] Clinic clinic)

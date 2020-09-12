@@ -152,7 +152,7 @@ namespace ddac7.Controllers
 
             if(c+1<10)
             rowkey = "C00" + (appointments.Count()+1).ToString(); 
-            else if(c+1>10&&c+1<100)
+            else if(c+1>=10&&c+1<100)
             rowkey = "C0" + (appointments.Count() + 1).ToString();
             else 
             rowkey = "C" + (appointments.Count() + 1).ToString();
@@ -176,7 +176,11 @@ namespace ddac7.Controllers
                 if (result.Etag != null)
                 {
                     TempData["message"] = "Your appointment request is now waiting for approval.";
-                    await Services.BusServiceQueue.SendQueueMsg(userid+","+"Kindly reminder on your appointment at "+clinicName +" at "+app.AppointmentDateTime+","+app.AppointmentDateTime);
+
+                    await Services.BusServiceQueue.SendQueueMsg(userid+","
+                        +"Kindly reminder on your appointment at "+clinicName 
+                        +" at "+app.AppointmentDateTime+","+app.AppointmentDateTime);
+
                     return RedirectToAction("ViewAppointmentRecord", "Home");
                 }
             }
@@ -262,7 +266,7 @@ namespace ddac7.Controllers
 
             return feedbacks;
         }
-
+       
         public IActionResult Feedback()
         {
             //data pass when the button click
@@ -289,7 +293,7 @@ namespace ddac7.Controllers
 
             if (f + 1 < 10)
                 rowkey = "F00" + (feedbacks.Count() + 1).ToString();
-            else if (f + 1 > 10 && f + 1 < 100)
+            else if (f + 1 >= 10 && f + 1 < 100)
                 rowkey = "F0" + (feedbacks.Count() + 1).ToString();
             else
                 rowkey = "F" + (feedbacks.Count() + 1).ToString();
