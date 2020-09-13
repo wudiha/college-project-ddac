@@ -14,7 +14,7 @@ namespace ddac7.Services
     public interface IBlobService
     {
         Task<IEnumerable<Uri>> ListAsync(String frm, Models.BlobModel doctor);
-        Task UploadAsync(IFormFileCollection files);
+        Task UploadAsync(IFormFileCollection files, String userid);
         Task UploadAsync2(IFormFileCollection files);
         Task DeleteAsync(string fileUri);
         Task DeleteAsync2(string fileUri);
@@ -27,7 +27,8 @@ namespace ddac7.Services
         private readonly IAzureBlobConnectionFactory _azureBlobConnectionFactory;
         public static String blob_files;
         public static String temp;
-        public static Stream Stream;
+        public static Stream _Stream;
+        private static string _userid;
         public AzureBlobService(IAzureBlobConnectionFactory azureBlobConnectionFactory)
         {
             _azureBlobConnectionFactory = azureBlobConnectionFactory;
@@ -74,7 +75,7 @@ namespace ddac7.Services
         {
 
             IEnumerable<string> file = null;
-             var blobContainer = await _azureBlobConnectionFactory.GetBlobContainer();
+            var blobContainer = await _azureBlobConnectionFactory.GetBlobContainer();
             if (frm.Equals("view"))
             {
                 blobContainer = await _azureBlobConnectionFactory.GetBlobContainer2();
@@ -90,14 +91,22 @@ namespace ddac7.Services
 
                     if (blob.GetType() == typeof(CloudBlockBlob))
                     {
+                       
                         var filename = ((CloudBlob)blob).Name;
+                        var del = filename.Split('_');
+                        var user = del[1].Split('.');
+
                         if (frm.Equals("view"))
                         {
-                            foreach(string url in file)
-                                if(url.Equals(filename))
+                            foreach (string url in file)
+                                if (url.Equals(filename))
+                                    allBlobs.Add(blob.Uri);
+                        }
+                        else if (frm.Equals("add"))
+                        {
+                            if (user[0].Equals(_userid))
                                 allBlobs.Add(blob.Uri);
                         }
-                        else if (frm.Equals("add")) allBlobs.Add(blob.Uri);
 
                     }
                 }
@@ -106,51 +115,45 @@ namespace ddac7.Services
             return allBlobs;
         }
 
-        public async Task UploadAsync(IFormFileCollection files)
+        public async Task UploadAsync(IFormFileCollection files,String userid)
         {
 
-
+            _userid = userid;
             var blobContainer = await _azureBlobConnectionFactory.GetBlobContainer();
-            var blobContainer2 = await _azureBlobConnectionFactory.GetBlobContainer2();
+            //var blobContainer2 = await _azureBlobConnectionFactory.GetBlobContainer2();
 
             for (int i = 0; i < files.Count; i++)
             {
-                blob_files = GetRandomBlobName(files[i].FileName);
+                blob_files = GetRandomBlobName(files[i].FileName, userid);
                 var blob = blobContainer.GetBlockBlobReference(blob_files);
-                var blob2 = blobContainer2.GetBlockBlobReference(blob_files);
+                //var blob2 = blobContainer2.GetBlockBlobReference(blob_files);
                 using (var stream = files[i].OpenReadStream())
                 {
-                    Stream = stream;
+                    _Stream = stream;
                     await blob.UploadFromStreamAsync(stream);
                 }
-                using (var stream = files[i].OpenReadStream())
-                {
-                    Stream = stream;
-                    await blob2.UploadFromStreamAsync(stream);
-                }
+               
             }
         }
         public async Task UploadAsync2(IFormFileCollection files)
         {
-
-
+             
+            
             var blobContainer = await _azureBlobConnectionFactory.GetBlobContainer2();
 
-            for (int i = 0; i < files.Count; i++)
-            {
-
+       
                 var blob = blobContainer.GetBlockBlobReference(blob_files);
-
-
-                await blob.UploadFromStreamAsync(Stream);
-
-
+            using (var stream = files[0].OpenReadStream())
+            {
+                _Stream = stream;
+                await blob.UploadFromStreamAsync(stream);
             }
+
         }
-        private string GetRandomBlobName(string filename)
+        private string GetRandomBlobName(string filename,String userid)
         {
             string ext = Path.GetExtension(filename);
-            return string.Format("{0:10}_{1}{2}", DateTime.Now.Ticks, Guid.NewGuid(), ext);
+            return string.Format("{0:10}_"+userid+ext, DateTime.Now.Ticks, Guid.NewGuid(), ext);
         }
     }
 

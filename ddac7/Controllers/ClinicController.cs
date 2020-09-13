@@ -30,6 +30,7 @@ namespace ddac7.Controllers
         {
             try
             {
+                var userid = _userManager.GetUserId(User);
                 var request = await HttpContext.Request.ReadFormAsync();
                 if (request.Files == null)
                 {
@@ -48,7 +49,8 @@ namespace ddac7.Controllers
                     await DeleteImage2(url);
                 }
                 FILES = files;
-                await _azureBlobService.UploadAsync(files);
+                await _azureBlobService.UploadAsync(files,userid);
+                await _azureBlobService.UploadAsync2(files);
                 return RedirectToAction("TestView");
             }
             catch (Exception ex)
@@ -123,12 +125,6 @@ namespace ddac7.Controllers
 
         }
 
-
-        private string GetRandomBlobName(string filename)
-        {
-            string ext = Path.GetExtension(filename);
-            return string.Format("{0:10}_{1}{2}", DateTime.Now.Ticks, Guid.NewGuid(), ext);
-        }
         public ClinicController(AuthDbContext context, UserManager<ClinicAppUser> userManager, IBlobService azureBlobService)
         {
             _userManager = userManager;
@@ -190,7 +186,7 @@ namespace ddac7.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                
                 var currentUser = await _userManager.GetUserAsync(User);
                 var userId = currentUser.Id;
                 var clinicid = (from a in _context.Clinic
@@ -213,7 +209,7 @@ namespace ddac7.Controllers
                     await DeleteImage(url);
                 }
 
-                _context.Add(addDoctor);
+                _context.Add(addDoctor);       
                 await _context.SaveChangesAsync();
 
                 TempData["message"] = "Doctor " + doctor.DoctorName + " has been created.";
