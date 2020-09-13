@@ -25,7 +25,7 @@ namespace ddac7.Services
     public class AzureBlobService : IBlobService
     {
         private readonly IAzureBlobConnectionFactory _azureBlobConnectionFactory;
-        public static String sss;
+        public static String blob_files;
         public static String temp;
         public static Stream Stream;
         public AzureBlobService(IAzureBlobConnectionFactory azureBlobConnectionFactory)
@@ -74,7 +74,7 @@ namespace ddac7.Services
         {
 
             IEnumerable<string> file = null;
-           var blobContainer = await _azureBlobConnectionFactory.GetBlobContainer();
+             var blobContainer = await _azureBlobConnectionFactory.GetBlobContainer();
             if (frm.Equals("view"))
             {
                 blobContainer = await _azureBlobConnectionFactory.GetBlobContainer2();
@@ -115,9 +115,9 @@ namespace ddac7.Services
 
             for (int i = 0; i < files.Count; i++)
             {
-                sss = GetRandomBlobName(files[i].FileName);
-                var blob = blobContainer.GetBlockBlobReference(sss);
-                var blob2 = blobContainer2.GetBlockBlobReference(sss);
+                blob_files = GetRandomBlobName(files[i].FileName);
+                var blob = blobContainer.GetBlockBlobReference(blob_files);
+                var blob2 = blobContainer2.GetBlockBlobReference(blob_files);
                 using (var stream = files[i].OpenReadStream())
                 {
                     Stream = stream;
@@ -139,7 +139,7 @@ namespace ddac7.Services
             for (int i = 0; i < files.Count; i++)
             {
 
-                var blob = blobContainer.GetBlockBlobReference(sss);
+                var blob = blobContainer.GetBlockBlobReference(blob_files);
 
 
                 await blob.UploadFromStreamAsync(Stream);

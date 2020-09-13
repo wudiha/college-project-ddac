@@ -19,7 +19,10 @@ namespace ddac7.Models
         [Display(Name = "Doctor Contact Number")]
         public string DoctorContactNumber { get; set; }
         public string imgurl { get; set; }
+        [Display(Name = "Profile Image")]
         public IEnumerable<Uri> profileImage { get; set; }
+        public int clinic_id { get; set; }
+        public string clinic_name { get; set; }
         public List<BlobModel> doctor { get; set; }
     }
 
@@ -36,5 +39,7 @@ namespace ddac7.Models
         [Display(Name = "Doctor Contact Number")]
         public string DoctorContactNumber { get; set; }
         public String profileImage { get; set; }
+        public int Clinic_Id { get; set; }
+
     }
 }
