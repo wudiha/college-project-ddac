@@ -1,3 +1,4 @@
 # college-project-ddac
 
-//Assignment ._.
+//Assignment 
+Clinic Appointment System -ASP.NET
