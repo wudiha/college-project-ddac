@@ -1,94 +1,244 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+@{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" />
+<link rel="stylesheet" href="~/css/carousel.css" />
+<link rel="stylesheet" href="~/css/imageslider.css" />
+<link rel="stylesheet" href="~/css/modal.css" />
+
+@if (Model.Count == 0)
+{
+    <script type="text/javascript">
+        document.onload = test();
+
+        function test() {
+            var buttonId = $(this).attr('id');
+            $('#modal-container').removeAttr('class').addClass(buttonId);
+            $('body').addClass('modal-active');
+        }
+    </script>
+}
+else
+{
+    <div class="content">
+
+        <div class="buttons">
+            <div id="one" class="button">You have a new reminder</div>
+        </div>
+    </div>
 }
 
-<div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
-    <ol class="carousel-indicators">
-        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-        <li data-target="#myCarousel" data-slide-to="1"></li>
-        <li data-target="#myCarousel" data-slide-to="2"></li>
-    </ol>
-    <div class="carousel-inner" role="listbox">
-        <div class="item active">
-            <img src="~/images/banner1.svg" alt="ASP.NET" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    ABC
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525028&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
-        <div class="item">
-            <img src="~/images/banner2.svg" alt="Visual Studio" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    There are powerful new features in Visual Studio for building modern web apps.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525030&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
-        <div class="item">
-            <img src="~/images/banner3.svg" alt="Microsoft Azure" class="img-responsive" />
-            <div class="carousel-caption" role="option">
-                <p>
-                    Learn how Microsoft's Azure cloud platform allows you to build, deploy, and scale web apps.
-                    <a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkID=525027&clcid=0x409">
-                        Learn More
-                    </a>
-                </p>
-            </div>
-        </div>
-    </div>
-    <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-    <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-    </a>
-</div>
+<body.index>
+    <div id="modal-container">
+        <div class="modal-background">
+            <div class="modal">
 
-<div class="row">
-    <div class="col-md-3">
-        <h2>Application uses</h2>
-        <ul>
-            <li>Sample pages using ASP.NET Core MVC</li>
-            <li>Theming using <a href="https://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
-        </ul>
+                @foreach (var v in Model)
+                {
+                    <h2>@v</h2>
+                    <br />
+                }
+
+            </div>
+        </div>
     </div>
-    <div class="col-md-3">
-        <h2>How to</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=398600">Add a Controller and View</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699315">Manage User Secrets using Secret Manager.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699316">Use logging to log a message.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699317">Add packages using NuGet.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699319">Target development, staging or production environment.</a></li>
-        </ul>
+    <div class="imgLoader"></div>
+
+    <div class="containers">
+
+        <h1 class="title">
+            TEBEST<br>APPOINTMENT PORTAL
+        </h1>
+
+        <div class="credit">
+            * APPOINTMENT NEVER BEEN SO EASY
+        </div>
+
+        <div class="book">
+            <div class="gap"></div>
+            <div class="pages">
+                <div class="page"></div>
+                <div class="page"></div>
+                <div class="page"></div>
+                <div class="page"></div>
+                <div class="page"></div>
+                <div class="page"></div>
+            </div>
+            <div class="flips">
+                <div class="flip flip1">
+                    <div class="flip flip2">
+                        <div class="flip flip3">
+                            <div class="flip flip4">
+                                <div class="flip flip5">
+                                    <div class="flip flip6">
+                                        <div class="flip flip7"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="col-md-3">
-        <h2>Overview</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=518008">Conceptual overview of what is ASP.NET Core</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=699320">Fundamentals of ASP.NET Core such as Startup and middleware.</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=398602">Working with Data</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkId=398603">Security</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699321">Client side development</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699322">Develop on different platforms</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=699323">Read more on the documentation site</a></li>
-        </ul>
-    </div>
-    <div class="col-md-3">
-        <h2>Run &amp; Deploy</h2>
-        <ul>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=517851">Run your app</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=517853">Run tools such as EF migrations and more</a></li>
-            <li><a href="https://go.microsoft.com/fwlink/?LinkID=398609">Publish to Microsoft Azure Web Apps</a></li>
-        </ul>
-    </div>
-</div>
+
+</body.index>
+<br />
+<section style="background-color:snow">
+    <div class="customer-feedback">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-sm-offset-2 col-sm-8">
+                    <div>
+                        <h2 class="section-title">What Customers Say</h2>
+                    </div>
+                </div><!-- /End col -->
+            </div><!-- /End row -->
+
+            <div class="row">
+                <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
+                    <div class="owl-carousel feedback-slider">
+
+                        <!-- slider item -->
+                        <div class="feedback-slider-item">
+                            <img src="//c2.staticflickr.com/8/7310/buddyicons/24846422@N06_r.jpg" class="center-block img-circle" alt="Customer Feedback">
+                            <h3 class="customer-name">Ling</h3>
+                            <p>TEBEST Portal really helped alot during the COVID period. Great Work!</p>
+                            <span class="light-bg customer-rating" data-rating="5">
+                                5
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </div>
+                        <!-- /slider item -->
+                        <!-- slider item -->
+                        <div class="feedback-slider-item">
+                            <img src="https://res.cloudinary.com/hnmqik4yn/image/upload/c_fill,fl_force_strip,h_128,q_100,w_128/v1493982718/ah57hnfnwxkmsciwivve.jpg" class="center-block img-circle" alt="Customer Feedback">
+                            <h3 class="customer-name">Tan</h3>
+                            <p>Love it!!! Super easy to use!</p>
+                            <span class="light-bg customer-rating" data-rating="4">
+                                4
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </div>
+                        <!-- /slider item -->
+                        <!-- slider item -->
+                        <div class="feedback-slider-item">
+                            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/451270/profile/profile-80.jpg" class="center-block img-circle" alt="Customer Feedback">
+                            <h3 class="customer-name">Chris</h3>
+                            <p>Save time, save enegry! Highly recommend</p>
+                            <span class="light-bg customer-rating" data-rating="5">
+                                5
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </div>
+                        <!-- /slider item -->
+
+                    </div><!-- /End feedback-slider -->
+                    <!-- side thumbnail -->
+                    <div class="feedback-slider-thumb hidden-xs">
+                        <div class="thumb-prev">
+                            <span>
+                                <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/451270/profile/profile-80.jpg" alt="Customer Feedback">
+                            </span>
+                            <span class="light-bg customer-rating">
+                                5
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </div>
+
+                        <div class="thumb-next">
+                            <span>
+                                <img src="https://res.cloudinary.com/hnmqik4yn/image/upload/c_fill,fl_force_strip,h_128,q_100,w_128/v1493982718/ah57hnfnwxkmsciwivve.jpg" alt="Customer Feedback">
+                            </span>
+                            <span class="light-bg customer-rating">
+                                4
+                                <i class="fa fa-star"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- /side thumbnail -->
+
+                </div><!-- /End col -->
+            </div><!-- /End row -->
+        </div><!-- /End container -->
+    </div><!-- /End customer-feedback -->
+</section>
+
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+<script>
+    $('.button').click(function () {
+        var buttonId = $(this).attr('id');
+        $('#modal-container').removeAttr('class').addClass(buttonId);
+        $('body').addClass('modal-active');
+    })
+
+    $('#modal-container').click(function () {
+        $(this).addClass('out');
+        $('body').removeClass('modal-active');
+    });
+    jQuery(document).ready(function ($) {
+
+        var feedbackSlider = $('.feedback-slider');
+        feedbackSlider.owlCarousel({
+            items: 1,
+            nav: true,
+            dots: true,
+            autoplay: true,
+            loop: true,
+            mouseDrag: true,
+            touchDrag: true,
+            navText: ["<i class='fa fa-long-arrow-left'></i>", "<i class='fa fa-long-arrow-right'></i>"],
+            responsive: {
+
+                // breakpoint from 767 up
+                767: {
+                    nav: true,
+                    dots: false
+                }
+            }
+        });
+
+        feedbackSlider.on("translate.owl.carousel", function () {
+            $(".feedback-slider-item h3").removeClass("animated fadeIn").css("opacity", "0");
+            $(".feedback-slider-item img, .feedback-slider-thumb img, .customer-rating").removeClass("animated zoomIn").css("opacity", "0");
+        });
+
+        feedbackSlider.on("translated.owl.carousel", function () {
+            $(".feedback-slider-item h3").addClass("animated fadeIn").css("opacity", "1");
+            $(".feedback-slider-item img, .feedback-slider-thumb img, .customer-rating").addClass("animated zoomIn").css("opacity", "1");
+        });
+        feedbackSlider.on('changed.owl.carousel', function (property) {
+            var current = property.item.index;
+            var prevThumb = $(property.target).find(".owl-item").eq(current).prev().find("img").attr('src');
+            var nextThumb = $(property.target).find(".owl-item").eq(current).next().find("img").attr('src');
+            var prevRating = $(property.target).find(".owl-item").eq(current).prev().find('span').attr('data-rating');
+            var nextRating = $(property.target).find(".owl-item").eq(current).next().find('span').attr('data-rating');
+            $('.thumb-prev').find('img').attr('src', prevThumb);
+            $('.thumb-next').find('img').attr('src', nextThumb);
+            $('.thumb-prev').find('span').next().html(prevRating + '<i class="fa fa-star"></i>');
+            $('.thumb-next').find('span').next().html(nextRating + '<i class="fa fa-star"></i>');
+        });
+        $('.thumb-next').on('click', function () {
+            feedbackSlider.trigger('next.owl.carousel', [300]);
+            return false;
+        });
+        $('.thumb-prev').on('click', function () {
+            feedbackSlider.trigger('prev.owl.carousel', [300]);
+            return false;
+        });
+
+    }); //end ready
+</script>

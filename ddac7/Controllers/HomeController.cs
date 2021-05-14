@@ -45,7 +45,7 @@ namespace ddac7.Controllers
 
             return View();
         }
-        public IActionResult AnotherTestView()
+        public IActionResult Landing()
         {
             return View();
         }
@@ -334,15 +334,37 @@ namespace ddac7.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public async Task<IActionResult> ttview()
+        public async Task<IActionResult> Index()
         {
+            if (User.IsInRole("Clinic"))
+            {
+                return LocalRedirect("~/Clinic/Index");
+            }
+            userid = _userManager.GetUserId(User);
+            //queueClient = new QueueClient(ServiceBusConnectionString, QueueName, ReceiveMode.PeekLock);
+            items = new List<string>();
+            var taskList = new List<Task>();
 
+            await Task.Run(() =>
+            {
+                queueClient = new QueueClient(ServiceBusConnectionString, QueueName, ReceiveMode.PeekLock);
+                var options = new MessageHandlerOptions(ExceptionMethod)
+                {
+                    MaxConcurrentCalls = 1,
+                    AutoComplete = false
+                };
+
+                queueClient.RegisterMessageHandler(ExecuteMessageProcessingAsync, options);
+            });
+
+            await Task.Delay(3000);
+            await queueClient.CloseAsync();
             return View(items);
         }
 
 
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index2()
         {
 
             if (User.IsInRole("Clinic"))

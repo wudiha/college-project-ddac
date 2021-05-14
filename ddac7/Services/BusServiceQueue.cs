@@ -11,13 +11,14 @@ namespace ddac7.Services
 {
     public class BusServiceQueue
     {
-        const string ServiceBusConnectionString = "Endpoint=sb://clinicappointment.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAZ+/oYPQFohQ9O2ZEoHopo0MAEgib8IgAjN5iEnNpM=";
+        const string ServiceBusConnectionString = "Endpoint=sb://clinicappointment.servicebus.windows.net/;" +
+            "SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAZ+/oYPQFohQ9O2ZEoHopo0MAEgib8IgAjN5iEnNpM=";
         const string QueueName = "testing";
         private static IQueueClient queueClient;
         public static List<string> items;
         public static async Task SendQueueMsg(String msg)
         {
-            
+
             queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
 
             // Send messages.
@@ -29,22 +30,18 @@ namespace ddac7.Services
         {
             try
             {
-                
-                    // Create a new message to send to the queue.
-                    string messageBody = msg;
-                    var message = new Message(Encoding.UTF8.GetBytes(messageBody));
+                string messageBody = msg;
+                var message = new Message(Encoding.UTF8.GetBytes(messageBody));
 
+                await queueClient.SendAsync(message);
 
-                    // Send the message to the queue.
-                    await queueClient.SendAsync(message);
-                
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+
             }
         }
-       
-     
+
+
     }
 }

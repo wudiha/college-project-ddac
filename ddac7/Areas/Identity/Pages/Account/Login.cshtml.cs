@@ -83,7 +83,7 @@ namespace ddac7.Areas.Identity.Pages.Account
 
                     if (roles.Any())
                     {
-                        if (roles.First().Equals("Admin"))
+                        if (roles.First().Equals("admin"))
                         {
                             return LocalRedirect("~/Admin/Index");  // admin layout
                         }

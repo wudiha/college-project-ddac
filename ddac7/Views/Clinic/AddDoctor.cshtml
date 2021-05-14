@@ -1,99 +1,65 @@
 ﻿@model ddac7.Models.BlobModel
 
-
 @{
 
-    Layout = "~/Views/Shared/_LayoutClinic.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<h2>View doctor</h2>
 
-<link rel="stylesheet" href="~/css/test.css" />
+
+
+
+
+<h2>Add doctor</h2>
+
 <hr />
+<div class="row">
+    <div class="col-md-4">
 
-@if (Model.profileImage != null)
-{
-    @foreach (var item in Model.profileImage)
-    {
+        <form asp-action="AddDoctorProfile">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="DoctorName" class="control-label"></label>
+                <input asp-for="DoctorName" class="form-control" />
+                <span asp-validation-for="DoctorName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
 
-        var x = @item.ToString();
-        var url = x.Replace("https://clinicappointmentdev2.blob.core.windows.net/doctor/", "");
+                <label asp-for="DoctorContactNumber" class="control-label"></label>
+                <input asp-for="DoctorContactNumber" class="form-control" />
+                <span asp-validation-for="DoctorContactNumber" class="text-danger"></span>
 
-        // <a href="@item" target="_blank"><img class="thumb" src="@item" alt="images" /></a><br />
-
-
-
-    }
-
-
-    <div class="container">
-        <ul class="gallery">
-
+            </div>
+            <input type="hidden" asp-for="id" />
+            <label asp-for="profileImage" class="control-label"></label>
+            <br />
             @if (Model.profileImage != null)
             {
                 @foreach (var item in Model.profileImage)
                 {
-                    var x = @item.ToString();
-                    var url = x.Replace("https://clinicappointmentdev2.blob.core.windows.net/doctor/", "");
-                    <li>
-                        <div class="flip">
+                    <div class="imageBlock">
 
+                        <a href="@item" target="_blank"><img class="thumb" src="@item" alt="images" /></a>
+                        <div class="deleteDiv"><img class="deleteIcon" src="~/Images/deleteImage.png" title="Delete Image" onclick="deleteImage('@item');" /></div>
+                    </div>
+                }
+          
+            }
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" id="add_doctor" />
+            </div>
+        </form>
 
-                            <div class="front-side" style="background-image:url(@item)"></div>
+        @using (Html.BeginForm("UploadAsync", "Clinic", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="fileUpload btn btn-primary">
+                <span>Select Profile Image</span><input type="file" id="file" name="selectFiles" class="upload" accept="image/x-png,image/gif,image/jpeg" onchange="DisplayFilesToUpload()" />
+            </div>
+           <p id="FilesToUpload"></p>
 
-                            <div class="back-side">
-                                <a href="#">
-                                    <div class="content">
-                                        <div class="loader"></div>
-                                        <div class="text">
+        }
 
-
-                                            @foreach (var items in Model.doctor)
-                                            {
-                                                if (items.imgurl != null)
-                                                {
-
-                                                    if (items.imgurl.Equals(@url))
-                                                    {
-
-                                                        <h3 style="text-decoration:none">
-                                                            @items.DoctorName
-
-                                                        </h3>
-                                                        <p>ContactNumber: @items.DoctorContactNumber</p>
-                                                        <p>Belongs to: @items.clinic_name</p>
-                                                            <br />                                         
-                                                      
-
-
-                                                    }
-                                                }
-                                            }
-
-
-
-
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                }}
-        </ul>
-        <br />
     </div>
-
-
-
-    @using (Html.BeginForm("DeleteAll", "Clinic", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        // <div class="fileUpload btn btn-danger"><span>Delete All Files</span><input type="submit" name="deleteAll" class="upload" /></div>
-    }
-}
-
-
-
-
+</div>
 
 
 @section Scripts {
@@ -124,8 +90,15 @@
             if ('size' in file) { html += "size: " + file.size + " bytes)<br>"; }
         }
 
+
         html += "<div class='fileUpload btn btn-primary'><span>Upload</span><input type='submit' class='upload 'value='Upload'/></div>"
         document.getElementById("FilesToUpload").innerHTML = html;
+
+
+        
+
+
+
     }
-   
+
 </script>

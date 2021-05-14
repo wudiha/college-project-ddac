@@ -51,7 +51,7 @@ namespace ddac7.Controllers
                 FILES = files;
                 await _azureBlobService.UploadAsync(files,userid);
                 await _azureBlobService.UploadAsync2(files);
-                return RedirectToAction("TestView");
+                return RedirectToAction("AddDoctor");
             }
             catch (Exception ex)
             {
@@ -67,7 +67,7 @@ namespace ddac7.Controllers
             try
             {
                 await _azureBlobService.DeleteAsync(fileUri);
-                return RedirectToAction("TestView");
+                return RedirectToAction("AddDoctor");
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace ddac7.Controllers
             try
             {
                 await _azureBlobService.UploadAsync2(FILES);
-                return RedirectToAction("TestView");
+                return RedirectToAction("AddDoctor");
             }
             catch (Exception ex)
             {
@@ -137,7 +137,7 @@ namespace ddac7.Controllers
             return View();
         }
 
-        public async Task<IActionResult> AddDoctor()
+        public async Task<IActionResult> ViewDoctor()
         {
 
             var userid = _userManager.GetUserId(User);
@@ -212,7 +212,7 @@ namespace ddac7.Controllers
                 _context.Add(addDoctor);       
                 await _context.SaveChangesAsync();
 
-                TempData["message"] = "Doctor " + doctor.DoctorName + " has been created.";
+                //TempData["message"] = "Doctor " + doctor.DoctorName + " has been created.";
 
                 return RedirectToAction("Index");
             }
@@ -221,11 +221,10 @@ namespace ddac7.Controllers
 
         }
 
-        public async Task<IActionResult> TestView()
+        public async Task<IActionResult> AddDoctor()
         {
             try
             {
-
 
                 var model = new BlobModel();
                 model.profileImage = await _azureBlobService.ListAsync("add",model);

@@ -11,13 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace ddac7.Controllers
 {
     //[Authorize(Roles ="SuperAdmin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     public class AdminController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ClinicAppUser> _userManager;
         private readonly AuthDbContext _context;
-
+        private const string ServiceBusConnectionString = "Endpoint=sb://clinicappointment.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAZ+/oYPQFohQ9O2ZEoHopo0MAEgib8IgAjN5iEnNpM=";
+        const string QueueName = "testing";
+        
         public AdminController(RoleManager<IdentityRole> roleManager, AuthDbContext context, UserManager<ClinicAppUser> userManager) {
             this.roleManager = roleManager;
             _userManager = userManager;
@@ -31,8 +33,9 @@ namespace ddac7.Controllers
         }
 
         //Admin Main Page
-        public IActionResult Index()
+        public IActionResult Index2()
         {
+            //await GetMsg();
             return View();
         }
 
@@ -49,12 +52,16 @@ namespace ddac7.Controllers
                               Id = user.Id,
                               Email = user.Email,
                               PhoneNumber = user.PhoneNumber,
-                          }).ToList();
+                          });
 
             return View(clinic);
 
+        }    
+        public IActionResult Index()
+        {
+            return View();
         }
-
+        
         //Get clinic details for edit
         [HttpGet]
         public async Task<IActionResult> EditClinic(string id)

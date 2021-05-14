@@ -30,10 +30,30 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">TEBEST</a>
-                <a asp-area="" asp-controller="Home" asp-action="AnotherTestView" class="navbar-brand">Test landing</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
+                    @if (User.IsInRole("Clinic"))
+                    {
+                        <div class="dropdown">
+                            <button class="dropbtn">Appointment</button>
+                            <div class="dropdown-content">
+                                <li><a asp-area="" asp-controller="Clinic" asp-action="SearchForAppointment">Search Appointment Record</a></li>
+
+                                <li><a asp-area="" asp-controller="Clinic" asp-action="PendingAppointment">Pending Appointment</a></li>
+                                <li><a asp-area="" asp-controller="Clinic" asp-action="CompleteAppointment">Appointment List</a></li>
+                                <li><a asp-area="" asp-controller="Clinic" asp-action="HistoryAppointment">Appointment History</a></li>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="dropbtn">Doctor</button>
+                            <div class="dropdown-content">
+
+                                <li><a asp-area="" asp-controller="Clinic" asp-action="ViewDoctor">View Doctor</a></li>
+                                <li><a asp-area="" asp-controller="Clinic" asp-action="AddDoctor">Add Doctor</a></li>
+                            </div>
+                        </div>
+                    }
                     @if (User.IsInRole("Patient"))
                     {
                         <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
@@ -47,16 +67,13 @@
                     {
                         <li><a asp-area="" asp-controller="Clinic" asp-action="Index">Home</a></li>
                         <li><a asp-area="" asp-controller="Clinic" asp-action="CreateClinic">Manage Clinic</a></li>
-                        <li><a asp-area="" asp-controller="Clinic" asp-action="PendingAppointment">Pending Appointment</a></li>
-                        <li><a asp-area="" asp-controller="Clinic" asp-action="CompleteAppointment">Appointment List</a></li>
-                        <li><a asp-area="" asp-controller="Clinic" asp-action="HistoryAppointment">Appointment History</a></li>
                         <li><a asp-area="" asp-controller="Clinic" asp-action="FeedbackReceived">Feedback</a></li>
-                        <li><a asp-area="" asp-controller="Clinic" asp-action="SearchForAppointment">Search Appointment Record</a></li>
                     }
-                    @if (User.IsInRole("Admin"))
+                    @if (User.IsInRole("admin"))
                     {
                         <li><a asp-area="" asp-controller="Admin" asp-action="Index">Home</a></li>
                         <li><a asp-area="" asp-controller="Admin" asp-action="ClinicList">Manage Clinic</a></li>
+                        <li><a asp-area="" asp-controller="Admin" asp-action="CreateRole">Add Role</a></li>
                     }
                 </ul>
                     <ul class="nav navbar-right">
